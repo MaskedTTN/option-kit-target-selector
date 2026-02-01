@@ -38,7 +38,11 @@ class VIDFetcher:
                 print(f"Fetching: {url}")
                 
                 # Start browser
-                browser = await uc.start()
+                #browser = await uc.start()
+                browser = await uc.start(
+                    browser_executable_path='/usr/bin/google-chrome-stable',
+                    headless=True
+                )
                 page = await browser.get(url)
                 await asyncio.sleep(10)
                 
