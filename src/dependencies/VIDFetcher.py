@@ -37,11 +37,16 @@ class VIDFetcher:
                 
                 print(f"Fetching: {url}")
                 
-                # Start browser
-                #browser = await uc.start()
+                # Start browser with proper config
                 browser = await uc.start(
                     browser_executable_path='/usr/bin/google-chrome-stable',
-                    headless=True
+                    headless=True,
+                    browser_args=[
+                        '--no-sandbox',
+                        '--disable-dev-shm-usage',
+                        '--disable-gpu',
+                        '--disable-software-rasterizer'
+                    ]
                 )
                 page = await browser.get(url)
                 await asyncio.sleep(10)
@@ -75,18 +80,35 @@ class VIDFetcher:
                     
             except Exception as e:
                 print(f"Error fetching VID: {e}")
+                import traceback
+                traceback.print_exc()
                 return None
             finally:
                 if browser:
-                    browser.stop()
+                    try:
+                        await browser.stop()
+                    except:
+                        pass
         
         # Run in new event loop
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         try:
-            return loop.run_until_complete(_fetch())
+            result = loop.run_until_complete(_fetch())
+            return result
+        except Exception as e:
+            print(f"Loop error: {e}")
+            return None
         finally:
-            loop.close()
+            try:
+                # Properly cleanup pending tasks
+                pending = asyncio.all_tasks(loop)
+                for task in pending:
+                    task.cancel()
+                loop.run_until_complete(asyncio.gather(*pending, return_exceptions=True))
+                loop.close()
+            except:
+                pass
     
     @staticmethod
     async def fetch_vid(selection: VehicleSelectionRequest) -> Optional[dict]:
