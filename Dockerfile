@@ -23,7 +23,9 @@ RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | gpg --d
 WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
-COPY . .
+COPY src/ .
+
+COPY tests/ ./tests/
 
 # Set display environment variable for Xvfb
 ENV DISPLAY=:99
@@ -31,5 +33,5 @@ ENV DISPLAY=:99
 # Use a shell script as a bridge to launch Xvfb and then your app
 # This avoids the JSONArgsRecommended warning
 #RUN echo 'Xvfb :99 -screen 0 1920x1080x24 & uvicorn main:app --host 0.0.0.0 --port 8003' > entrypoint.sh && chmod +x entrypoint.sh
-WORKDIR /src
+
 CMD ["./entrypoint.sh"]
