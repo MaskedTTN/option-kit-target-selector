@@ -1,10 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 import uvicorn
-
-from routers import v1
+#from v1 import router
+from routers.v1 import router
+#from VIDFetcher import VIDFetcher
+from dependencies.VIDFetcher import VIDFetcher
 
 app = FastAPI(
     title="BMW VID Lookup Service",
@@ -20,28 +21,22 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(v1.router)
+app.include_router(router)
 
-# Thread pool for running nodriver
-executor = ThreadPoolExecutor(max_workers=3)
+@app.on_event("startup")
+async def startup_event():
+    """Start the browser once when the container starts"""
+    await VIDFetcher.get_browser()
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Properly close the browser on shutdown"""
+    if VIDFetcher._browser:
+        await VIDFetcher._browser.stop()
 
 @app.get("/")
 async def root():
-    """Health check"""
-    return {
-        "service": "BMW VID Lookup Service",
-        "status": "operational",
-        "version": "0.1.0"
-    }
-
-
-@app.get("/health")
-async def health_check():
-    """Detailed health check"""
-    return {
-        "status": "healthy",
-        "timestamp": datetime.utcnow().isoformat()
-    }
+    return {"service": "BMW VID Lookup Service", "status": "operational"}
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8003, reload=True)
+    uvicorn.run("main:app", host="0.0.0.0", port=8001)
