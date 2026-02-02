@@ -54,6 +54,7 @@ class VIDFetcher:
                 # Get HTML and parse
                 html = await page.get_content()
                 soup = BeautifulSoup(html, 'html.parser')
+                print("soup:", soup.prettify()[:500])  # Print first 500 chars of prettified HTML
                 
                 # Find VID in hidden input
                 vid_input = soup.find('input', type="hidden")
