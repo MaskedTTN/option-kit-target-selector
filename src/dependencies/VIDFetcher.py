@@ -17,8 +17,8 @@ class VIDFetcher:
         if cls._browser is None or not cls._browser.connection or cls._browser.connection.closed:
             print("Starting (or restarting) browser instance...")
             cls._browser = await uc.start(
-                headless=True,
-                sandbox=False,
+                headless=False,
+                #sandbox=False,
                 browser_args=['--no-sandbox', '--disable-dev-shm-usage', '--disable-gpu']
             )
         return cls._browser
