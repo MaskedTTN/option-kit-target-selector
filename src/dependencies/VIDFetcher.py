@@ -17,7 +17,7 @@ class VIDFetcher:
             print("Starting (or restarting) browser instance...")
             cls._browser = await uc.start(
                 headless=False,
-                no_sandbox=True,
+                sandbox=False,
                 browser_args=['--no-sandbox', '--disable-dev-shm-usage', '--disable-gpu']
             )
         return cls._browser
