@@ -24,3 +24,10 @@ jobs:
           docker run --shm-size=2gb \
           -e PYTHONPATH=/app \
           target-selector pytest tests/
+
+      - name: Upload Debug Screenshot
+        if: failure() # Only runs if the previous step fails
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-screenshots
+          path: error_screenshot.png

@@ -2,6 +2,7 @@ import nodriver as uc
 from bs4 import BeautifulSoup
 from typing import Optional
 from models import VehicleSelectionRequest
+import asyncio
 
 class VIDFetcher:
     """Fetches VIDs from RealOEM using a persistent nodriver instance"""
@@ -37,10 +38,19 @@ class VIDFetcher:
             if selection.steering: url += f"&steering={selection.steering}"
 
             page = await browser.get(url)
+
+            await asyncio.sleep(5)
             
             # Wait for the specific element that contains the VID
             # Increasing timeout slightly for the second request
-            await page.wait_for("input[name='id']", timeout=20)
+            #await page.wait_for("input[name='id']", timeout=45)
+            try:
+                await page.wait_for("input[name='id']", timeout=45)
+            except Exception as e:
+                # 3. Take a screenshot to debug exactly what is on the screen
+                await page.save_screenshot("error_screenshot.png")
+                print(f"Timeout waiting for element. Screenshot saved. Error: {e}")
+                return None
             
             content = await page.get_content()
             soup = BeautifulSoup(content, 'html.parser')
