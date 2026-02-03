@@ -46,6 +46,7 @@ class VIDFetcher:
             #await page.wait_for("input[name='id']", timeout=45)
             try:
                 await page.wait_for("input[name='id']", timeout=45)
+                await page.save_screenshot("error_screenshot.png")
             except Exception as e:
                 # 3. Take a screenshot to debug exactly what is on the screen
                 await page.save_screenshot("error_screenshot.png")
