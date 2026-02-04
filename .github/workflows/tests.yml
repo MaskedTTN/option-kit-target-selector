@@ -1,0 +1,33 @@
+name: Scraper Integration Tests
+
+on:
+  push:
+    branches: "*"
+  pull_request:
+    branches: "*"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker Image
+        run: docker build -t target-selector .
+
+      - name: Run Pytest in Container
+        # We use --shm-size to prevent Chrome crashes
+        # We override the CMD to run pytest instead of the server
+        run: |
+          docker run --shm-size=2gb \
+          -e PYTHONPATH=/app \
+          target-selector pytest tests/
+
+      - name: Upload Debug Screenshot
+        if: failure() # Only runs if the previous step fails
+        uses: actions/upload-artifact@v4
+        with:
+          name: debug-screenshots
+          path: error_screenshot.png
