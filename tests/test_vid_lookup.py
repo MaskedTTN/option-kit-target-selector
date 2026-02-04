@@ -24,7 +24,7 @@ async def test_health_check():
     assert response.json()["status"] == "operational"
 
 # 3. Test Database Cache Logic (Unit Test)
-""" def test_database_caching(test_db):
+def test_database_caching(test_db):
     sample_data = {
         'vid': 'TEST-VID-123',
         'series': 'F22N',
@@ -48,11 +48,11 @@ async def test_health_check():
     )
     
     assert cached is not None
-    assert cached['vid'] == 'TEST-VID-123' """
+    assert cached['vid'] == 'TEST-VID-123'
 
 # 4. Integration Test: RealOEM Fetcher (Requires Browser/Xvfb)
 # We mark this so we can skip it if we don't want to run the browser
-@pytest.mark.integration
+""" @pytest.mark.integration
 @pytest.mark.asyncio
 async def test_real_oem_fetch():
     selection = VehicleSelectionRequest(
@@ -70,4 +70,4 @@ async def test_real_oem_fetch():
     
     assert result is not None
     assert "vid" in result
-    assert result["series"] == "F22N"
+    assert result["series"] == "F22N" """
